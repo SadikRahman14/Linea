@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken"
 
 
-ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || "15m";
-REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY || "7d";
+const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || "15m";
+const REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY || "7d";
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
     profileSetup:{
         type: Boolean,
         required: false
+    },
+    refreshToken:{
+        type: String
     }
 })
 

@@ -46,3 +46,12 @@ connectDB()
 .catch(err => {
     console.log("MongoDB Connection Failed!!", err);
 })
+
+
+// import routers
+
+import authRoutes from "./src/routes/auth.route.js";
+
+
+
+app.use("api/v1/auth", authRoutes);
