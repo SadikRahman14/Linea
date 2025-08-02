@@ -3,15 +3,108 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
 import { Input } from '../../components/ui/input'
 import { Button } from '../../components/ui/button'
 import Background from '../../assets/login-vector.png'
+import { toast } from 'sonner'
+import { apiClient } from '@/lib/api-client'
+import { LOGIN_ROUTES, SIGNUP_ROUTES } from '@/utils/constants'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 function Auth() {
 
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
+    const navigate = useNavigate()
+    const [loginEmail, setLoginEmail] = useState("");
+    const [loginPassword, setLoginPassword] = useState("");
+
+    const [signupEmail, setSignupEmail] = useState("");
+    const [signupPassword, setSignupPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
     
-    const handleLogin  = async () => {};
-    const handleSignup = async () => {};
+    const validateSignup = () => {
+        if(!signupEmail.length){
+            toast.error("Email is Required");
+            return false;
+        }
+        if(!signupPassword.length){
+            toast.error("Password is Required")
+            return false;
+        }
+        if(signupPassword !== confirmPassword){
+            toast.error("Passwords Must be Same")
+            return false;
+        }
+        return true;
+    }
+
+    const validateLogin = () => {
+        if(!loginEmail.length){
+            toast.error("Email is Required");
+            return false;
+        }
+        if(!loginPassword.length){
+            toast.error("Password is Required")
+            return false;
+        }
+        return true;
+    }
+
+
+
+
+    const handleLogin  = async () => {
+        
+
+        if(!validateLogin()) return; 
+
+        try {
+            const response = await apiClient.post(LOGIN_ROUTES, {
+                email : loginEmail,
+                password : loginPassword
+            },
+            {
+                withCredentials: true
+            }
+            );
+
+            const { user } = response.data.data;
+
+            console.log("Login Response:", response.data);
+            toast.success("Logged in Successfully");
+
+            if (user && user._id) {
+                navigate(user.profileSetup ? "/chat" : "/profile");
+            } else {
+                toast.error("Invalid user data received");
+                console.error("Missing user data:", user);
+            }
+
+        } catch (error) {
+            toast.error("Login Failed, Try Again");
+            console.log(error)
+        }
+    };
+
+
+    const handleSignup = async () => {
+
+        if(!validateSignup()) return; 
+
+        try {
+            const response = await apiClient.post(SIGNUP_ROUTES, {
+                email: signupEmail, 
+                password: signupPassword
+            })
+            console.log({ response });
+            toast.success("Signed Up Successfully");
+
+            if(response.status === 201){
+                navigate("/profile")
+            }
+        } catch (error) {
+            toast.error("SignUp Failed, Try Again");
+            console.log(error)
+        }
+        
+    }
 
   return (
     <div className='h-[100vh] w-[100vw] flex items-center justify-center'>
@@ -26,7 +119,7 @@ function Auth() {
                     </p>
                 </div>
                 <div className="flex items-center justify-center w-full">
-                    <Tabs className='w-3/4'>
+                    <Tabs className='w-3/4' defaultValue='login'>
                         <TabsList className="flex bg-transparent rounded-none w-full">
                             <TabsTrigger value="login"
                             className="data-[state=active]:bg-transparent text-black text-opacity-90 border-b-2 rounded-none w-full data-[state=active]:text-black data-[state=active]: font-semibold
@@ -44,19 +137,19 @@ function Auth() {
                                 placeholder = "Email"
                                 type="email"
                                 className="rounded-full p-6"
-                                value={email}
-                                onChange = {(e) => setEmail(e.target.value)}
+                                value={loginEmail}
+                                onChange = {(e) => setLoginEmail(e.target.value)}
                             />
                             <Input
                                 placeholder = "Password"
                                 type="password"
                                 className="rounded-full p-6"
-                                value={password}
-                                onChange = {(e) => setPassword(e.target.value)}
+                                value={loginPassword}
+                                onChange = {(e) => setLoginPassword(e.target.value)}
                             />
                             <Button 
                                 className="rounded-full p-6"
-                                onclick={handleLogin}
+                                onClick={handleLogin}
                                 > L O G I N 
                             </Button>
                         </TabsContent>
@@ -66,15 +159,15 @@ function Auth() {
                                 placeholder = "Email"
                                 type="email"
                                 className="rounded-full p-6"
-                                value={email}
-                                onChange = {(e) => setEmail(e.target.value)}
+                                value={signupEmail}
+                                onChange = {(e) => setSignupEmail(e.target.value)}
                             />
                             <Input
                                 placeholder = "Password"
                                 type="password"
                                 className="rounded-full p-6"
-                                value={password}
-                                onChange = {(e) => setPassword(e.target.value)}
+                                value={signupPassword}
+                                onChange = {(e) => setSignupPassword(e.target.value)}
                             />
                             <Input
                                 placeholder = "Confirm Password"
@@ -85,7 +178,7 @@ function Auth() {
                             />
                             <Button 
                                 className="rounded-full p-6"
-                                onclick={handleSignup}
+                                onClick={handleSignup}
                                 > S I G N U P 
                             </Button>
                         </TabsContent>

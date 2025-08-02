@@ -1,57 +1,39 @@
-import express from "express"
-import mongoose from "mongoose"
+import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./db/index.js";
+import authRoutes from "./src/routes/auth.route.js";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
-const databaseURI = process.env.DATABASE_URI;
-
-app.use(
-    cors({
-        origin: [process.env.ORIGIN],
-        methods: ["GET","POST","PUT","PATCH","DELETE"],
-        credentials: true
-    })
-)
 
 
-app.use(express.json({
-    limit: "16kb"
-}))
+app.use(cors({
+  origin: process.env.ORIGIN,
+  credentials: true
+}));
 
-app.use(express.urlencoded({
-    extended: true,
-    limit: "16kb"
-}))
+app.use(express.json());
+app.use(cookieParser()); 
 
-app.use(express)
-app.use(cookieParser);
+// Debug route to confirm server is running
+app.get("/", (req, res) => {
+  res.send("Server is live");
+});
 
+// Routes
+app.use("/api/v1/auth", authRoutes);
 
-const server = app.listen(port, () => {
-    console.log(`Server is running at http:/localhost:${port}`);
-})
 
 connectDB()
-.then( () => {
+  .then(() => {
     app.listen(port, () => {
-        console.log(`Server is running at http:/localhost:${port}`)
-    })
-})
-.catch(err => {
-    console.log("MongoDB Connection Failed!!", err);
-})
-
-
-// import routers
-
-import authRoutes from "./src/routes/auth.route.js";
-
-
-
-app.use("api/v1/auth", authRoutes);
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  })
+  .catch(err => {
+    console.error("MongoDB connection failed", err);
+  });

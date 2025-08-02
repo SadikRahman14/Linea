@@ -4,12 +4,14 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import mongoose from "mongoose"
 import jwt from "jsonwebtoken"
+import { request } from "express"
 
 
 
 const options = {
     httpOnly : true,
-    secure : true
+    secure : true,
+    sameSite: "Lax"
 }
 
 const generateAccessAndRefreshToken = async(userId) => {
@@ -76,7 +78,11 @@ const refreshAccessToken = asyncHandler( async(req, res) => {
 
 const signup = asyncHandler( async(req, res) => {
 
+
+    console.log("Hot Now");
     const { email, password } = req.body;
+
+    console.log("📩 Received:", email, password);
 
     if(!email || !password){
         throw new ApiError(400, "Both email and password are required")
@@ -97,18 +103,78 @@ const signup = asyncHandler( async(req, res) => {
     return res
         .status(201)
         .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, options)
         .json(
             new ApiResponse(201, {
                 user : {
                     _id: createUser._id,
-                    email: createUser.email
+                    email: createUser.email,
                 },
-                accessToken
+                
             }, "User Registered Successfully")
         )
 
 })
 
+
+
+const login = asyncHandler( async(req, res) => {
+    const { email, password } = req.body;
+
+    if(!email || !password){
+        throw new ApiError(400, "Email and Password is required")
+    }
+
+    const user = await User.findOne({email});
+
+    if(!user){
+        throw new ApiError(404, "User Credentials Not Found");
+    }
+
+    const isPaswordValid = await user.isPasswordCorrect(password);
+
+    if(!isPaswordValid){
+        throw new ApiError(401, "Password is Incorrect");
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+
+    const loggedInUser = await User.findById(user._id)
+    .select("-password -refreshToken")
+
+
+
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options) // fixed typo here
+    .json(
+        new ApiResponse(
+            200,
+            {
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    profileSetup: user.profileSetup,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    image: user.image,
+                    color: user.color
+                },
+                accessToken,
+                refreshToken
+            },
+            "User Logged in Successfully"
+        )
+    );
+
+
+
+})
+
+
 export {
-    signup
+    signup,
+    login
 }
