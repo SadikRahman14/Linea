@@ -7,9 +7,12 @@ import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 import { LOGIN_ROUTES, SIGNUP_ROUTES } from '@/utils/constants'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { useAppStore } from '@/store'
+
 
 function Auth() {
 
+    const { setUserInfo } = useAppStore();
     const navigate = useNavigate()
     const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
@@ -52,7 +55,6 @@ function Auth() {
 
     const handleLogin  = async () => {
         
-
         if(!validateLogin()) return; 
 
         try {
@@ -71,6 +73,7 @@ function Auth() {
             toast.success("Logged in Successfully");
 
             if (user && user._id) {
+                setUserInfo(response.data.data.user);
                 navigate(user.profileSetup ? "/chat" : "/profile");
             } else {
                 toast.error("Invalid user data received");
@@ -97,6 +100,7 @@ function Auth() {
             toast.success("Signed Up Successfully");
 
             if(response.status === 201){
+                setUserInfo(response.data.data.user);
                 navigate("/profile")
             }
         } catch (error) {

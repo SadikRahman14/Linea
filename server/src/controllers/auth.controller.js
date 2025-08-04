@@ -4,13 +4,11 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import mongoose from "mongoose"
 import jwt from "jsonwebtoken"
-import { request } from "express"
-
 
 
 const options = {
     httpOnly : true,
-    secure : true,
+    secure : false,
     sameSite: "Lax"
 }
 
@@ -58,7 +56,7 @@ const refreshAccessToken = asyncHandler( async(req, res) => {
             throw new ApiError(401, "Refresh Token is expired or used");
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id);
+        const { accessToken,  refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id);
 
         return res
         .status(200)
@@ -173,8 +171,47 @@ const login = asyncHandler( async(req, res) => {
 
 })
 
+const getUserInfo = asyncHandler(async (req, res) => {
+  try {
+    // console.log("req.userId =", req.userId);
+
+    const userData = await User.findById(req.userId);
+
+    if (!userData) {
+      throw new ApiError(404, "User with Given ID not Found!");
+    }
+
+    console.log({userData})
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            _id: userData._id,
+            email: userData.email,
+            profileSetup: userData.profileSetup,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            image: userData.image,
+            color: userData.color,
+          },
+        },
+        "User Data Fetched Successfully"
+      )
+    );
+  } catch (error) {
+    console.error("getUserInfo Error:", error);
+  }
+});
+
+
+
+
 
 export {
     signup,
-    login
+    login,
+    getUserInfo,
+    refreshAccessToken
 }
