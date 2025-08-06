@@ -7,6 +7,6 @@ import { Toaster } from 'sonner'
 createRoot(document.getElementById('root')).render(
   <>
     <App />
-    <Toaster closeButton/>
+    <Toaster position='top-center' closeButton/>
   </>,
 )

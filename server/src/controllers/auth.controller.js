@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import mongoose from "mongoose"
 import jwt from "jsonwebtoken"
-
+import { renameSync, unlinkSync} from "fs"
 
 const options = {
     httpOnly : true,
@@ -34,7 +34,6 @@ const generateAccessAndRefreshToken = async(userId) => {
         throw new ApiError(500, "Something went wrong");
     }
 }
-
 
 const refreshAccessToken = asyncHandler( async(req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
@@ -71,8 +70,6 @@ const refreshAccessToken = asyncHandler( async(req, res) => {
         throw new ApiError(401, error?.message || "Invalid Refresh Token")
     }
 })
-
-
 
 const signup = asyncHandler( async(req, res) => {
 
@@ -113,8 +110,6 @@ const signup = asyncHandler( async(req, res) => {
         )
 
 })
-
-
 
 const login = asyncHandler( async(req, res) => {
     const { email, password } = req.body;
@@ -205,13 +200,100 @@ const getUserInfo = asyncHandler(async (req, res) => {
   }
 });
 
+const updateProfile = asyncHandler( async(req, res, next) => {
+    const userId = req.userId;
+
+    if(!userId){
+        throw new ApiError(404, "The user ID was not found");
+    }
+
+    const {firstName, lastName, color} = req.body;
+    if(!firstName || !lastName){
+        throw new ApiError(400, " Three Fields are Required ")
+    }
+
+    const userData = await User.findByIdAndUpdate(
+        userId,
+        {
+            firstName,
+            lastName,
+            color,
+            profileSetup: true
+        },
+        { new: true, runValidators: true }
+    )
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                _id: userData._id,
+                email: userData.email,
+                profileSetup: userData.profileSetup,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                image: userData.image,
+                color: userData.color,
+            },
+            "Profile Updated Successfully!!"
+        )
+    )
+
+})
+
+const addProfileImage = asyncHandler( async(req, res, next) => {
+    if(!req.file){
+        throw new ApiError(400, "File is Required")
+    }
+
+    const date = Date.now();
+    let fileName = "uploads/profiles/" + date + req.file.originalname;
+    renameSync(req.file.path, fileName);
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.userId,
+        { image: fileName },
+        {new: true, runValidators: true}
+    );
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                image: updatedUser.image,
+            },
+            "Image Updated Successfully"
+        )
+    )
+})
 
 
+const removeProfileImage = asyncHandler( async(req, res, next) => {
+    const { userId } = req;
+    const user = await User.findById(userId);
 
+    if(!user){
+        throw new ApiError(400, "User Not Found");
+    }
+
+    if(user.image){
+        unlinkSync(user.image)
+    }
+
+    user.image = null;
+    await user.save();
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Image Deleted Successfully!!")
+    )
+})
 
 export {
     signup,
     login,
     getUserInfo,
-    refreshAccessToken
+    refreshAccessToken,
+    updateProfile,
+    addProfileImage,
+    removeProfileImage
 }
