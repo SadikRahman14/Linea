@@ -288,6 +288,25 @@ const removeProfileImage = asyncHandler( async(req, res, next) => {
     )
 })
 
+const logoutUser = asyncHandler( async(req, res) => {
+    const {userId} = req;
+    await User.findByIdAndUpdate(
+        userId,
+        {
+            $set:{
+                refreshToken: null
+            }
+        },
+        {new: true}
+    )
+
+
+    return res.status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User Logged Out Successfully"));
+})
+
 export {
     signup,
     login,
@@ -295,5 +314,6 @@ export {
     refreshAccessToken,
     updateProfile,
     addProfileImage,
-    removeProfileImage
+    removeProfileImage,
+    logoutUser
 }
