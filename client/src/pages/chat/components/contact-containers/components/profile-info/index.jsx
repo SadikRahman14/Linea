@@ -68,8 +68,8 @@ function ProfileComponent() {
             </Avatar>
             </div>
             <div className='oswald-custom '>
-                {userInfo.firstName && userInfo.lastName ? 
-                    `${userInfo.firstName} ${userInfo.lastName}` : ""
+                {userInfo.lastName ? 
+                    `${userInfo.lastName}` : ""
                 }
             </div>
         </div>
@@ -85,36 +85,38 @@ function ProfileComponent() {
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
+
+
             <AlertDialog>
-          <TooltipProvider>
-            <Tooltip>
-              <AlertDialogTrigger asChild>
-                <TooltipTrigger>
-                  <RiShutDownLine className='text-red-500 text-xl font-medium cursor-pointer' />
-                </TooltipTrigger>
-              </AlertDialogTrigger>
+                <TooltipProvider>
+                    <Tooltip>
+                    <AlertDialogTrigger asChild>
+                        <TooltipTrigger>
+                        <RiShutDownLine className='text-red-500 text-xl font-medium cursor-pointer' />
+                        </TooltipTrigger>
+                    </AlertDialogTrigger>
 
-              <TooltipContent className='bg-[#1b1c1e] border-none text-white'>
-                <p>Log Out</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                    <TooltipContent className='bg-[#1b1c1e] border-none text-white'>
+                        <p>Log Out</p>
+                    </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
 
-          <AlertDialogContent className='bg-black'>
-            <AlertDialogHeader>
-              <AlertDialogTitle> <RiShutDownLine className='text-red-500 text-3xl font-medium cursor-pointer'/> </AlertDialogTitle>
-              <AlertDialogDescription className='font-bold'>
-                Are you sure you want to log out?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className='bg-red-700' onClick={logout}>
-                LogOut
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog> 
+                <AlertDialogContent className='bg-black'>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle> <RiShutDownLine className='text-red-500 text-3xl font-medium cursor-pointer'/> </AlertDialogTitle>
+                    <AlertDialogDescription className='font-bold'>
+                        Are you sure you want to log out?
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction className='bg-red-700' onClick={logout}>
+                            LogOut
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog> 
         </div>
     </div>
   )
