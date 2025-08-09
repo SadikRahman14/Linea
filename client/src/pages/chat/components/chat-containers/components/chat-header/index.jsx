@@ -3,7 +3,7 @@ import React from 'react'
 import { RiCloseFill } from 'react-icons/ri'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { HOST } from '@/utils/constants'
-
+import { getColor } from '@/lib/utils'
 
 function ChatHeader() {
 
@@ -37,10 +37,10 @@ function ChatHeader() {
                     
                 </div>
                 <div>
-                        {selectedChatType === "contact" && 
-                            `${selectedChatData.firstName} ${selectedChatData.lastName}`
-                        }
-                    </div>
+                    {selectedChatType === "contact" && 
+                        `${selectedChatData.firstName} ${selectedChatData.lastName}`
+                    }
+                </div>
             </div>
             
             <div className="flex items-center justify-center gap-5">

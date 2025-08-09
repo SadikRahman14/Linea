@@ -23,6 +23,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { HOST } from '@/utils/constants';
 import { useAppStore } from '@/store';
+import { getColor } from '@/lib/utils';
 
 function NewDM() {
   const [openNewContactModal, setOpenNewContactModal] = useState(false);

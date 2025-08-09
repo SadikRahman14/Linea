@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./db/index.js";
+import setupSocket from "./socket.js"
+import http from "http";
 
 
 dotenv.config();
@@ -27,6 +29,7 @@ app.get("/", (req, res) => {
   res.send("Server is live");
 });
 
+
 // Routes
 
 import authRoutes from "./src/routes/auth.route.js";
@@ -37,9 +40,12 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/contact", contactRoutes)
 
 
+const server = http.createServer(app);
+setupSocket(server);
+
 connectDB()
   .then(() => {
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server running at http://localhost:${port}`);
     });
   })
