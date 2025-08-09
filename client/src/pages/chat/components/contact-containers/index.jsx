@@ -1,8 +1,28 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ProfileComponent from './components/profile-info';
 import NewDM from './components/new-dm/index.jsx';
+import { apiClient } from '@/lib/api-client';
+import { GET_DM_CONTACTS } from '@/utils/constants';
+import ContactList from '@/components/contact-list';
+import { useAppStore } from '@/store';
 
 function ContactContainer() {
+
+  const { directMessagesContacts, setDirectMessagesContacts } = useAppStore();
+
+
+  useEffect(() => {
+    const getContacts = async() => {
+      const response = await apiClient.get(GET_DM_CONTACTS,
+        {withCredentials: true}
+      );
+      if(response.data.data.contacts){
+        setDirectMessagesContacts(response.data.data.contacts);
+      }
+    };
+    getContacts();
+  },[])
+
   return (
     <div className='relative md:w-[35vw] lg:w-[30vw] xl:w[20vw] bg-[#1b1c24] border-r-2 border-[#2c2d35] w-full'>
         <div className='pt-3'>
@@ -13,11 +33,24 @@ function ContactContainer() {
                 <Title text="Direct Message"/>
                 <NewDM/>
             </div>
+            <div
+              className="overflow-y-auto max-h-[38vh]"
+              style={{
+                scrollbarWidth: 'none',           // Firefox
+                msOverflowStyle: 'none'           // IE, Edge
+              }}
+            >
+              <ContactList contacts={directMessagesContacts} />
+              <style jsx>{`
+                div::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+            </div>
         </div>
         <div className='my-5'>
             <div className="flex items-center justify-between pr-10">
                 <Title text="Channels"/>
-                
             </div>
         </div>
         
