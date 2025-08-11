@@ -180,7 +180,7 @@ const renderDMMessages = (message) => {
             </div>
           )}
 
-          <div className={`text-xs text-gray-600 ${isSender ? "text-right" : "text-left"} ml-3`}>
+          <div className={`text-xs text-gray-600 ${isSender ? "text-right" : "text-left"} ml-2`}>
             {moment(message.timeStamp).format("LT")}
           </div>
         </div>
