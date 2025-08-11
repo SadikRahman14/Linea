@@ -38,11 +38,11 @@ function ContactContainer() {
   },[setChannels, setDirectMessagesContacts])
 
   return (
-    <div className='relative  md:w-[35vw] lg:w-[30vw] xl:w[20vw] bg-[#193228] border-r-2 border-[#010b44] w-full'>
+    <div className='relative  md:w-[35vw] lg:w-[30vw] xl:w[20vw] bg-[#193228] border-r-2 border-[#eff0f6] w-full'>
         <div className='pt-3'>
             <Logo/>
         </div>
-        <div className='my-5'>
+        <div className='my-5 mb-'>
             <div className="flex items-center justify-between pr-10">
                 <Title text="Direct Message"/>
                 <NewDM/>
@@ -62,7 +62,7 @@ function ContactContainer() {
               `}</style>
             </div>
         </div>
-        <div className='my-5 mb-0'>
+        <div className='my-5'>
             <div className="flex items-center justify-between pr-10">
           <Title text="Channels" />
           <CreateChannel/>
@@ -70,8 +70,8 @@ function ContactContainer() {
         <div
               className="overflow-y-auto max-h-[38vh]"
               style={{
-                scrollbarWidth: 'none',           // Firefox
-                msOverflowStyle: 'none'           // IE, Edge
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'          
               }}
             >
           <ContactList contacts={channels} isChannel={ true } />
@@ -82,7 +82,6 @@ function ContactContainer() {
               `}</style>
             </div>
         </div>
-        
         <ProfileComponent/>
     </div>
   )
