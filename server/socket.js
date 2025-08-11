@@ -24,41 +24,48 @@ const setupSocket = (server) => {
   }
 
   // Change sendMessage to accept senderId explicitly
-  const sendMessage = async (message, senderId) => {
-    if (!senderId) {
-      console.error("Sender ID missing");
-      return;
-    }
-
-    // Overwrite sender in message for security
-    message.sender = senderId;
-
-    if (!message.recipient) {
-      console.error("Recipient missing in message", message);
-      return;
-    }
-
-    try {
-      const senderSocketId = userSocketMap.get(senderId);
-      const recipientSocketId = userSocketMap.get(message.recipient);
-
-      const createdMessage = await Message.create(message);
-
-      const messageData = await Message.findById(createdMessage._id)
-        .populate("sender", "id email firstName lastName image color")
-        .populate("recipient", "id email firstName lastName image color");
-
-      if (recipientSocketId) {
-        io.to(recipientSocketId).emit("recieveMessage", messageData);
-      }
-
-      if (senderSocketId) {
-        io.to(senderSocketId).emit("recieveMessage", messageData);
-      }
-    } catch (err) {
-      console.error("Failed to send message:", err);
-    }
+const sendMessage = async (message, senderId) => {
+  if (!senderId) {
+    console.error("Sender ID missing");
+    return;
   }
+
+  if (!message.recipient) {
+    console.error("Recipient missing in message", message);
+    return;
+  }
+
+  try {
+    // Explicitly build the message object to save
+    const messageToCreate = {
+      sender: senderId,
+      recipient: message.recipient,
+      content: message.content || null,
+      messageType: message.messageType || "text",
+      timeStamp: new Date(),
+      fileURL: message.fileURL || null,
+    };
+
+    const createdMessage = await Message.create(messageToCreate);
+
+    const messageData = await Message.findById(createdMessage._id)
+      .populate("sender", "id email firstName lastName image color")
+      .populate("recipient", "id email firstName lastName image color");
+
+    const senderSocketId = userSocketMap.get(senderId);
+    const recipientSocketId = userSocketMap.get(message.recipient);
+
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("recieveMessage", messageData);
+    }
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("recieveMessage", messageData);
+    }
+  } catch (err) {
+    console.error("Failed to send message:", err);
+  }
+};
+
 
 const sendChannelMessage = async (message, senderId) => {
   try {
