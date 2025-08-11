@@ -1,6 +1,6 @@
 import { clsx } from "clsx";  
 import { twMerge } from "tailwind-merge";  
-import animationData from "@/assets/Lets.json"
+import animationData from "@/assets/notun.json"
 
 
 export function cn(...inputs) {

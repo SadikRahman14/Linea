@@ -102,7 +102,30 @@ const getContactsForDMList = asyncHandler(async(req,res) => {
     )
 })
 
+
+const getAllContacts = asyncHandler(async (req, res) => { 
+    const user = await User.find({
+        _id: { $ne: req.userId }
+    },
+        "firstName lastName _id"
+    );
+
+    const contacts = user.map((user) => ({
+        label: `${user.firstName} ${user.lastName}`,
+        value: user._id
+    }))
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            { contacts },
+            "Get ALL CONTACTS SUCCESSSFULL!!"
+        )
+    )
+})
+
 export {
     searchContact,
-    getContactsForDMList
+    getContactsForDMList,
+    getAllContacts
 }

@@ -3,6 +3,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import Message from "../models/messages.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {renameSync, mkdirSync} from "fs"
+import path from "path";
+import { populate } from "dotenv";
 
 const getMessages = asyncHandler( async(req,res) => {
     const userOne = req.userId;
@@ -17,7 +19,7 @@ const getMessages = asyncHandler( async(req,res) => {
             { sender: userOne, recipient: userTwo },
             { sender: userTwo, recipient: userOne}
         ],
-    }).sort({timestamps: 1});
+    }).sort({timeStamp: 1});
 
     return res.status(200).json(
         new ApiResponse(
@@ -53,7 +55,8 @@ const uploadFile = asyncHandler(async(req,res) => {
 
 
 
+
 export {
     getMessages,
-    uploadFile
+    uploadFile,
 }

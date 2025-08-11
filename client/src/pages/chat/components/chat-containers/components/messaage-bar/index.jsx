@@ -54,6 +54,17 @@ function MessageBar() {
                 fileURL: undefined,
             })
         }
+        else if (selectedChatType === "channel") {
+            socket.emit("send-channel-message", {
+                sender: userInfo.id,
+                content: message,
+                recipient: selectedChatData._id,
+                messageType: "text",
+                fileURL: undefined,
+                channelId: selectedChatData._id,
+            })
+        }
+        setMessage("");
     }
 
     const handleAttachmentClick = () => {
@@ -90,11 +101,19 @@ function MessageBar() {
                         socket.emit("sendMessage", {
                             sender: userInfo._id,
                             content: undefined,
-                            recipient: selectedChatData._id,
                             messageType: "file",
                             fileURL: response.data.data.fileURL,
                         })
                         console.log("FIle URL:", fileURL);
+                    }
+                    else if (selectedChatType === "channel") {
+                        socket.emit("send-channel-message", {
+                            sender: userInfo.id,
+                            content: undefined,
+                            messageType: "file",
+                            fileURL: response.data.data.fileURL,
+                            channelId: selectedChatData._id,
+                        })
                     }
                 }
             }
@@ -113,6 +132,12 @@ function MessageBar() {
                     type="text"
                     className='flex-1 p-5 bg-transparent rounded-md focus:border-none focus:outline-none'
                     placeholder='Enter Message'
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) { 
+                        e.preventDefault();
+                        handleSendMessage();
+                        }
+                    }}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                 />

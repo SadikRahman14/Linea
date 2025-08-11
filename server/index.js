@@ -36,11 +36,12 @@ app.get("/", (req, res) => {
 import authRoutes from "./src/routes/auth.route.js";
 import contactRoutes from "./src/routes/contacts.route.js";
 import messagesRoutes from "./src/routes/messages.route.js";
-
+import channelRouter from "./src/routes/channel.route.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/contact", contactRoutes)
 app.use("/api/v1/messages", messagesRoutes)
+app.use("/api/v1/channel", channelRouter)
 
 const server = http.createServer(app);
 setupSocket(server);
